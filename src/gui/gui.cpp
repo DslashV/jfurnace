@@ -2244,6 +2244,24 @@ void FurnaceGUI::openFileDialog(FurnaceGUIFileDialogs type) {
         );
       }
       break;
+    case GUI_FILE_EXPORT_COMPILED_INS:
+      if (!dirExists(workingDirROMExport)) workingDirROMExport=getHomeDir();
+      hasOpened=fileDialog->openSave(
+        _("Export Compiled Instruments"),
+        {_("binary file"), "*.bin"},
+        workingDirROMExport,
+        dpiScale
+      );
+      break;
+    case GUI_FILE_EXPORT_COMPILED_INS_ONE:
+      if (!dirExists(workingDirROMExport)) workingDirROMExport=getHomeDir();
+      hasOpened=fileDialog->openSave(
+        _("Export Compiled Instrument"),
+        {_("binary file"), "*.bin"},
+        workingDirROMExport,
+        dpiScale
+      );
+      break;
     case GUI_FILE_LOAD_MAIN_FONT:
       if (!dirExists(workingDirFont)) workingDirFont=getHomeDir();
       hasOpened=fileDialog->openLoad(
@@ -2834,7 +2852,6 @@ void FurnaceGUI::editStr(String* which) {
 void FurnaceGUI::showWarning(String what, FurnaceGUIWarnings type) {
   warnString=what;
   warnAction=type;
-  warnIsOpen=true;
   warnQuit=true;
 
   const char* tYes=_N("Yes");
@@ -5631,6 +5648,8 @@ bool FurnaceGUI::loop() {
         case GUI_FILE_EXPORT_ROM:
         case GUI_FILE_EXPORT_TEXT:
         case GUI_FILE_EXPORT_CMDSTREAM:
+        case GUI_FILE_EXPORT_COMPILED_INS:
+        case GUI_FILE_EXPORT_COMPILED_INS_ONE:
           workingDirROMExport=fileDialog->getPath()+DIR_SEPARATOR_STR;
           break;
         case GUI_FILE_LOAD_MAIN_FONT:
@@ -5737,7 +5756,9 @@ bool FurnaceGUI::loop() {
           if (curFileDialog==GUI_FILE_EXPORT_TEXT) {
             checkExtension(".txt");
           }
-          if (curFileDialog==GUI_FILE_EXPORT_CMDSTREAM) {
+          if (curFileDialog==GUI_FILE_EXPORT_CMDSTREAM ||
+              curFileDialog==GUI_FILE_EXPORT_COMPILED_INS ||
+              curFileDialog==GUI_FILE_EXPORT_COMPILED_INS_ONE) {
             checkExtension(".bin");
           }
           if (curFileDialog==GUI_FILE_EXPORT_COLORS) {
@@ -6219,6 +6240,52 @@ bool FurnaceGUI::loop() {
                 }
               }
               break;
+            case GUI_FILE_EXPORT_COMPILED_INS: {
+              romExportPath=copyOfName;
+              SafeWriter* w=e->compileAllIns(insCompileType);
+              if (w!=NULL) {
+                FILE* f=ps_fopen(copyOfName.c_str(),"wb");
+                if (f!=NULL) {
+                  fwrite(w->getFinalBuf(),1,w->size(),f);
+                  fclose(f);
+                  pushRecentSys(copyOfName.c_str());
+                } else {
+                  showError(_("could not open file!"));
+                }
+                w->finish();
+                delete w;
+              } else {
+                showError(fmt::sprintf(_("could not export compiled instruments! (%s)"),e->getLastError()));
+              }
+              break;
+            }
+            case GUI_FILE_EXPORT_COMPILED_INS_ONE: {
+              if (curIns<0 || curIns>=(int)e->song.ins.size()) {
+                showError(_("I'm sure you can see why that's not the best idea right now..."));
+                break;
+              }
+              romExportPath=copyOfName;
+              SafeWriter* w=new SafeWriter;
+              w->init();
+
+              DivInstrument* ins=e->song.ins[curIns];
+
+              if (ins->compile(w,(DivInstrumentType)insCompileType)) {
+                FILE* f=ps_fopen(copyOfName.c_str(),"wb");
+                if (f!=NULL) {
+                  fwrite(w->getFinalBuf(),1,w->size(),f);
+                  fclose(f);
+                  pushRecentSys(copyOfName.c_str());
+                } else {
+                  showError(_("could not open file!"));
+                }
+              } else {
+                showError(fmt::sprintf(_("could not compile instrument! (%s)"),e->getLastError()));
+              }
+              w->finish();
+              delete w;
+              break;
+            }
             case GUI_FILE_EXPORT_TEXT: {
               SafeWriter* w=e->saveText(false);
               if (w!=NULL) {
@@ -6345,7 +6412,6 @@ bool FurnaceGUI::loop() {
 
     if (warnQuit && introPos>=11.0) {
       warnQuit=false;
-      warnIsOpen=true;
       ImGui::OpenPopup(_("Warning"));
     }
 
@@ -6710,7 +6776,6 @@ bool FurnaceGUI::loop() {
               selEnd.order=0;
               MARK_MODIFIED;
               recalcTimestamps=true;
-              warnIsOpen=false;
               ImGui::CloseCurrentPopup();
             }
             if (ImGui::Button(_("Current subsong"))) {
@@ -6725,7 +6790,6 @@ bool FurnaceGUI::loop() {
               selEnd.order=0;
               MARK_MODIFIED;
               recalcTimestamps=true;
-              warnIsOpen=false;
               ImGui::CloseCurrentPopup();
             }
             if (ImGui::Button(_("Orders"))) {
@@ -6741,7 +6805,6 @@ bool FurnaceGUI::loop() {
               selEnd.order=0;
               MARK_MODIFIED;
               recalcTimestamps=true;
-              warnIsOpen=false;
               ImGui::CloseCurrentPopup();
             }
             if (ImGui::Button(_("Pattern"))) {
@@ -6754,7 +6817,6 @@ bool FurnaceGUI::loop() {
               });
               MARK_MODIFIED;
               recalcTimestamps=true;
-              warnIsOpen=false;
               ImGui::CloseCurrentPopup();
             }
             if (ImGui::Button(_("Instruments"))) {
@@ -6764,7 +6826,6 @@ bool FurnaceGUI::loop() {
               });
               setCurIns(-1);
               MARK_MODIFIED;
-              warnIsOpen=false;
               ImGui::CloseCurrentPopup();
             }
             if (ImGui::Button(_("Wavetables"))) {
@@ -6774,7 +6835,6 @@ bool FurnaceGUI::loop() {
               });
               curWave=0;
               MARK_MODIFIED;
-              warnIsOpen=false;
               ImGui::CloseCurrentPopup();
             }
             if (ImGui::Button(_("Samples"))) {
@@ -6784,7 +6844,6 @@ bool FurnaceGUI::loop() {
               });
               curSample=0;
               MARK_MODIFIED;
-              warnIsOpen=false;
               ImGui::CloseCurrentPopup();
             }
 
@@ -6802,7 +6861,6 @@ bool FurnaceGUI::loop() {
               });
               MARK_MODIFIED;
               recalcTimestamps=true;
-              warnIsOpen=false;
               ImGui::CloseCurrentPopup();
             }
             if (ImGui::Button(_("Remove unused patterns"))) {
@@ -6812,14 +6870,12 @@ bool FurnaceGUI::loop() {
               });
               MARK_MODIFIED;
               recalcTimestamps=true;
-              warnIsOpen=false;
               ImGui::CloseCurrentPopup();
             }
             if (ImGui::Button(_("Remove unused instruments"))) {
               stop();
               e->delUnusedIns();
               MARK_MODIFIED;
-              warnIsOpen=false;
               ImGui::CloseCurrentPopup();
             }
             /*
@@ -6827,14 +6883,12 @@ bool FurnaceGUI::loop() {
               stop();
               e->delUnusedWaves();
               MARK_MODIFIED;
-              warnIsOpen=false;
               ImGui::CloseCurrentPopup();
             }*/
             if (ImGui::Button(_("Remove unused samples"))) {
               stop();
               e->delUnusedSamples();
               MARK_MODIFIED;
-              warnIsOpen=false;
               ImGui::CloseCurrentPopup();
             }
 
@@ -6849,7 +6903,6 @@ bool FurnaceGUI::loop() {
             ImGui::TableNextColumn();
             ImGui::TableNextColumn();
             if (ImGui::Button(_("Never mind! Cancel")) || ImGui::IsKeyPressed(ImGuiKey_Escape)) {
-              warnIsOpen=false;
               ImGui::CloseCurrentPopup();
             }
             ImGui::TableNextColumn();
@@ -6868,7 +6921,6 @@ bool FurnaceGUI::loop() {
             bool keyAccepted=(wc.key != -1) && ImGui::IsKeyPressed((ImGuiKey)wc.key) && passthroughKey;
             String name=passthroughKey?(fmt::sprintf("%s",_(wc.name))):(_(wc.name));
             if (ImGui::Button(_(name.c_str())) || keyAccepted) {
-              warnIsOpen=false;
               ImGui::CloseCurrentPopup();
               wc.action();
             }
@@ -6883,6 +6935,8 @@ bool FurnaceGUI::loop() {
 
       ImGui::EndPopup();
     }
+
+    warnIsOpen=ImGui::IsPopupOpen(_("Warning"));
 
     if (ImGui::BeginPopup("InsTypeList",ImGuiWindowFlags_NoMove|ImGuiWindowFlags_AlwaysAutoResize|ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoSavedSettings)) {
       char temp[1024];
@@ -7249,10 +7303,15 @@ bool FurnaceGUI::loop() {
       ImGui::Text(_("Sample rate"));
       ImGui::SameLine();
       ImGui::SetNextItemWidth(120.0f*dpiScale);
+      pushWarningColor(pendingRawSampleRate>384000);
       if (ImGui::InputInt("##RSRate",&pendingRawSampleRate,100,1000)) {
         if (pendingRawSampleRate<100) pendingRawSampleRate=100;
-        if (pendingRawSampleRate>384000) pendingRawSampleRate=384000;
       }
+      if (pendingRawSampleRate>384000) {
+        ImGui::SetItemTooltip(_("this rate is too high. instability may occur!"));
+      }
+      popWarningColor();
+      
 
       if (pendingRawSampleDepth==DIV_SAMPLE_DEPTH_8BIT || pendingRawSampleDepth==DIV_SAMPLE_DEPTH_16BIT) {
         ImGui::AlignTextToFramePadding();
@@ -9363,6 +9422,7 @@ FurnaceGUI::FurnaceGUI():
   romExportSave(false),
   pendingExport(NULL),
   romExportExists(false),
+  insCompileType(DIV_INS_SNES),
   warnIsOpen(false) {
   // value keys
   valueKeys[SDLK_0]=0;
