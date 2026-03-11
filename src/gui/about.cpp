@@ -22,10 +22,10 @@
 #include <math.h>
 
 const char* aboutLine[]={
-  "tildearrow",
+  "tildearrow (fork by D/V)",
   _N("is proud to present"),
   "",
-  ("Furnace " DIV_VERSION),
+  ("JFurnace " DIV_VERSION),
   "",
   _N("the biggest multi-system chiptune tracker!"),
   _N("featuring DefleMask song compatibility."),
@@ -41,6 +41,7 @@ const char* aboutLine[]={
   "asiekierka",
   "cam900",
   "djtuBIG-MaliceX",
+  "D/V",
   "Eknous",
   "host12prog",
   "Kagamiin~",
