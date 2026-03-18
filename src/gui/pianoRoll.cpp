@@ -227,7 +227,8 @@ void FurnaceGUI::drawPianoRoll() {
     float cxl=ox+pianoW+cursor.y*rowW;
     dl->AddRectFilled(ImVec2(cxl,twp.y),ImVec2(cxl+2,twp.y+timelineH),IM_COL32(255,255,100,200));
     {
-      const char* ordStr=fmt::sprintf("ORD %02X",ord).c_str();
+      String ordStrS=fmt::sprintf("ORD %02X",ord);
+      const char* ordStr=ordStrS.c_str();
       ImVec2 osz=ImGui::CalcTextSize(ordStr);
       float ox2=twp.x+4, oy2=twp.y+2;
       dl->AddRectFilled(ImVec2(ox2-1,oy2-1),ImVec2(ox2+osz.x+2,oy2+osz.y+1),
