@@ -517,6 +517,7 @@ class DivEngine {
   bool loadIT(unsigned char* file, size_t len);
   bool loadFTM(unsigned char* file, size_t len, bool dnft, bool dnftSig, bool eft);
   bool loadFC(unsigned char* file, size_t len);
+  bool loadVIC(unsigned char* file, size_t len);
   bool loadTFMv1(unsigned char* file, size_t len);
   bool loadTFMv2(unsigned char* file, size_t len);
 
@@ -585,6 +586,7 @@ class DivEngine {
   friend class DivExportZSM;
   friend class DivExportiPod;
   friend class DivExportGRUB;
+  friend class DivExportVIC20;
 
   public:
     DivSong song;
@@ -650,6 +652,8 @@ class DivEngine {
     // - -1 to auto-determine trailing
     // - -2 to add a whole loop of trailing
     SafeWriter* saveVGM(bool* sysToExport=NULL, bool loop=true, int version=0x171, bool patternHints=false, bool directStream=false, int trailingTicks=-1, bool dpcm07=false, int correctedRate=44100);
+    // dump to TIunA.
+    SafeWriter* saveTiuna(const bool* sysToExport, const char* baseLabel, int firstBankSize, int otherBankSize);
     // dump command stream.
     SafeWriter* saveCommand(DivCSProgress* progress=NULL, DivCSOptions options=DivCSOptions());
     // export to text
@@ -1072,6 +1076,9 @@ class DivEngine {
 
     // go to order
     void setOrder(unsigned char order);
+
+    // seek to order and row
+    void seekTo(unsigned char order, int row);
 
     // update system flags
     void updateSysFlags(int system, bool restart, bool render);

@@ -765,6 +765,7 @@ src/engine/fileOps/ftm.cpp
 src/engine/fileOps/fur.cpp
 src/engine/fileOps/it.cpp
 src/engine/fileOps/mod.cpp
+src/engine/fileOps/vic.cpp
 src/engine/fileOps/s3m.cpp
 src/engine/fileOps/text.cpp
 src/engine/fileOps/tfm.cpp
@@ -895,6 +896,7 @@ src/engine/export/tiuna.cpp
 src/engine/export/zsm.cpp
 src/engine/export/ipod.cpp
 src/engine/export/grub.cpp
+src/engine/export/vic20.cpp
 
 src/engine/effect/abstract.cpp
 src/engine/effect/dummy.cpp
@@ -1000,6 +1002,7 @@ src/gui/osc.cpp
 src/gui/patManager.cpp
 src/gui/pattern.cpp
 src/gui/piano.cpp
+src/gui/pianoRoll.cpp
 src/gui/presets.cpp
 src/gui/refPlayer.cpp
 src/gui/regView.cpp

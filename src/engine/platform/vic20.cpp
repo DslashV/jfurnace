@@ -22,7 +22,7 @@
 #include "../../ta-log.h"
 #include <math.h>
 
-#define rWrite(a,v) {regPool[(a)]=(v)&0xff; vic_sound_machine_store(vic,a,(v)&0xff);}
+#define rWrite(a,v) {regPool[(a)]=(v)&0xff; vic_sound_machine_store(vic,a,(v)&0xff); if (dumpWrites) addWrite(a,(v)&0xff);}
 
 #define CHIP_DIVIDER 32
 #define SAMP_DIVIDER 4

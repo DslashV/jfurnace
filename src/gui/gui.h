@@ -537,6 +537,22 @@ enum FurnaceGUIColors {
 
   GUI_COLOR_EE_VALUE,
   GUI_COLOR_PLAYBACK_STAT,
+
+  GUI_COLOR_PIANO_ROLL_BG,
+  GUI_COLOR_PIANO_ROLL_KEY_WHITE,
+  GUI_COLOR_PIANO_ROLL_KEY_BLACK,
+  GUI_COLOR_PIANO_ROLL_KEY_BORDER,
+  GUI_COLOR_PIANO_ROLL_GRID,
+  GUI_COLOR_PIANO_ROLL_GRID_HI1,
+  GUI_COLOR_PIANO_ROLL_GRID_HI2,
+  GUI_COLOR_PIANO_ROLL_NOTE,
+  GUI_COLOR_PIANO_ROLL_NOTE_OFF,
+  GUI_COLOR_PIANO_ROLL_NOTE_REL,
+  GUI_COLOR_PIANO_ROLL_SELECTION,
+  GUI_COLOR_PIANO_ROLL_FX_VOL,
+  GUI_COLOR_PIANO_ROLL_FX_NUM,
+  GUI_COLOR_PIANO_ROLL_FX_VAL,
+
   GUI_COLOR_MAX
 };
 
@@ -1943,6 +1959,7 @@ class FurnaceGUI {
     int controlLayout;
     int statusDisplay;
     float dpiScale;
+    float prFontScale;
     int viewPrevPattern;
     int guiColorsBase;
     int guiColorsShading;
@@ -2199,6 +2216,7 @@ class FurnaceGUI {
       controlLayout(3),
       statusDisplay(0),
       dpiScale(0.0f),
+      prFontScale(1.0f),
       viewPrevPattern(1),
       guiColorsBase(0),
       guiColorsShading(0),
@@ -2440,6 +2458,14 @@ class FurnaceGUI {
   bool subSongsOpen, findOpen, spoilerOpen, patManagerOpen, sysManagerOpen, clockOpen, speedOpen;
   bool groovesOpen, xyOscOpen, memoryOpen, csPlayerOpen, cvOpen, userPresetsOpen, refPlayerOpen;
   bool multiInsSetupOpen;
+  bool pianoRollOpen;
+  int prChan;
+  float prZoom;
+  float prNoteH;
+  float prEffectLaneH;
+  float prTimelineH;
+  bool prShowAllChans;
+  int prSelRow0, prSelRow1;
 
   bool cvNotSerious;
 
@@ -3102,6 +3128,7 @@ class FurnaceGUI {
   void drawMemory();
   void drawCompatFlags();
   void drawPiano();
+  void drawPianoRoll();
   void drawNotes(bool asChild=false);
   void drawTuner();
   void drawSpectrum();

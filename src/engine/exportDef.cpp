@@ -132,6 +132,18 @@ void DivEngine::registerROMExports() {
     false, DIV_REQPOL_ANY
   );
 
+  romExportDefs[DIV_ROM_VIC20]=new DivROMExportDef(
+    "VIC-20 register dump", "rednoobmusic",
+    "raw VIC-20 sound chip register dump.\n"
+    "5 bytes per frame: CH1 pitch, CH2 pitch, CH3 pitch, noise pitch, volume.\n"
+    "header contains title, author, tick rate and loop point.",
+    "VIC file", ".vic",
+    {
+      DIV_SYSTEM_VIC20
+    },
+    false, DIV_REQPOL_ANY
+  );
+
   romExportDefs[DIV_ROM_GRUB]=new DivROMExportDef(
     "GRUB_INIT_TUNE", "AArt1256",
     "GRUB_INIT_TUNE export\n"

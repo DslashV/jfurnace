@@ -3036,6 +3036,12 @@ void FurnaceGUI::drawSettings() {
           } rightClickable
         }
 
+        if (ImGui::SliderFloat(_("Piano roll font scale"),&settings.prFontScale,0.5f,3.0f,"%.2fx")) {
+          if (settings.prFontScale<0.5f) settings.prFontScale=0.5f;
+          if (settings.prFontScale>3.0f) settings.prFontScale=3.0f;
+          settingsChanged=true;
+        } rightClickable
+
         if (ImGui::InputInt(_("Icon size"),&settings.iconSize,1,3)) {
           if (settings.iconSize<3) settings.iconSize=3;
           if (settings.iconSize>48) settings.iconSize=48;
@@ -4092,6 +4098,23 @@ void FurnaceGUI::drawSettings() {
           UI_COLOR_CONFIG(GUI_COLOR_ERROR,_("Error hint"));
           ImGui::TreePop();
         }
+        if (ImGui::TreeNode(_("Piano Roll"))) {
+          UI_COLOR_CONFIG(GUI_COLOR_PIANO_ROLL_BG,_("Background"));
+          UI_COLOR_CONFIG(GUI_COLOR_PIANO_ROLL_KEY_WHITE,_("White key"));
+          UI_COLOR_CONFIG(GUI_COLOR_PIANO_ROLL_KEY_BLACK,_("Black key"));
+          UI_COLOR_CONFIG(GUI_COLOR_PIANO_ROLL_KEY_BORDER,_("Key border"));
+          UI_COLOR_CONFIG(GUI_COLOR_PIANO_ROLL_GRID,_("Grid"));
+          UI_COLOR_CONFIG(GUI_COLOR_PIANO_ROLL_GRID_HI1,_("Grid highlight 1"));
+          UI_COLOR_CONFIG(GUI_COLOR_PIANO_ROLL_GRID_HI2,_("Grid highlight 2"));
+          UI_COLOR_CONFIG(GUI_COLOR_PIANO_ROLL_NOTE,_("Note"));
+          UI_COLOR_CONFIG(GUI_COLOR_PIANO_ROLL_NOTE_OFF,_("Note off"));
+          UI_COLOR_CONFIG(GUI_COLOR_PIANO_ROLL_NOTE_REL,_("Note release"));
+          UI_COLOR_CONFIG(GUI_COLOR_PIANO_ROLL_SELECTION,_("Selection"));
+          UI_COLOR_CONFIG(GUI_COLOR_PIANO_ROLL_FX_VOL,_("FX: volume"));
+          UI_COLOR_CONFIG(GUI_COLOR_PIANO_ROLL_FX_NUM,_("FX: command"));
+          UI_COLOR_CONFIG(GUI_COLOR_PIANO_ROLL_FX_VAL,_("FX: value"));
+          ImGui::TreePop();
+        }
         if (ImGui::TreeNode(_("File Picker (built-in)"))) {
           UI_COLOR_CONFIG(GUI_COLOR_FILE_DIR,_("Directory"));
           UI_COLOR_CONFIG(GUI_COLOR_FILE_SONG_NATIVE,_("Song (native)"));
@@ -4872,6 +4895,7 @@ void FurnaceGUI::readConfig(DivConfig& conf, FurnaceGUISettingGroups groups) {
     settings.noDMFCompat=conf.getInt("noDMFCompat",0);
 
     settings.dpiScale=conf.getFloat("dpiScale",0.0f);
+    settings.prFontScale=conf.getFloat("prFontScale",1.0f);
 
     settings.initialSysName=conf.getString("initialSysName","");
 
@@ -5511,6 +5535,7 @@ void FurnaceGUI::writeConfig(DivConfig& conf, FurnaceGUISettingGroups groups) {
     conf.set("noDMFCompat",settings.noDMFCompat);
 
     conf.set("dpiScale",settings.dpiScale);
+    conf.set("prFontScale",settings.prFontScale);
 
     conf.set("initialSys2",settings.initialSys.toBase64());
     conf.set("initialSysName",settings.initialSysName);

@@ -4225,6 +4225,7 @@ bool FurnaceGUI::loop() {
   DECLARE_METRIC(memory)
   DECLARE_METRIC(compatFlags)
   DECLARE_METRIC(piano)
+  DECLARE_METRIC(pianoRoll)
   DECLARE_METRIC(notes)
   DECLARE_METRIC(tuner)
   DECLARE_METRIC(spectrum)
@@ -4888,6 +4889,7 @@ bool FurnaceGUI::loop() {
         IMPORT_CLOSE(userPresetsOpen);
         IMPORT_CLOSE(refPlayerOpen);
         IMPORT_CLOSE(multiInsSetupOpen);
+        IMPORT_CLOSE(pianoRollOpen);
       } else if (pendingLayoutImportStep==1) {
         // let the UI settle
       } else if (pendingLayoutImportStep==2) {
@@ -5266,6 +5268,7 @@ bool FurnaceGUI::loop() {
         if (ImGui::MenuItem(_("effect list"),BIND_FOR(GUI_ACTION_WINDOW_EFFECT_LIST),effectListOpen)) effectListOpen=!effectListOpen;
         if (ImGui::MenuItem(_("play/edit controls"),BIND_FOR(GUI_ACTION_WINDOW_EDIT_CONTROLS),editControlsOpen)) editControlsOpen=!editControlsOpen;
         if (ImGui::MenuItem(_("piano/input pad"),BIND_FOR(GUI_ACTION_WINDOW_PIANO),pianoOpen)) pianoOpen=!pianoOpen;
+        if (ImGui::MenuItem(_("piano roll"),NULL,pianoRollOpen)) pianoRollOpen=!pianoRollOpen;
         if (ImGui::MenuItem(_("reference music player"),BIND_FOR(GUI_ACTION_WINDOW_REF_PLAYER),refPlayerOpen)) refPlayerOpen=!refPlayerOpen;
         if (ImGui::MenuItem(_("multi-ins setup"),BIND_FOR(GUI_ACTION_WINDOW_MULTI_INS_SETUP),multiInsSetupOpen)) multiInsSetupOpen=!multiInsSetupOpen;
         if (spoilerOpen) if (ImGui::MenuItem(_("spoiler"),NULL,spoilerOpen)) spoilerOpen=!spoilerOpen;
@@ -5520,6 +5523,7 @@ bool FurnaceGUI::loop() {
       MEASURE(memory,drawMemory());
       MEASURE(compatFlags,drawCompatFlags());
       MEASURE(piano,drawPiano());
+      MEASURE(pianoRoll,drawPianoRoll());
       MEASURE(notes,drawNotes());
       MEASURE(tuner,drawTuner());
       MEASURE(spectrum,drawSpectrum());
@@ -8414,6 +8418,9 @@ void FurnaceGUI::syncState() {
 #else
   pianoOpen=e->getConfBool("pianoOpen",false);
 #endif
+  pianoRollOpen=e->getConfBool("pianoRollOpen",false);
+  prChan=e->getConfInt("prChan",0);
+  prZoom=e->getConfFloat("prZoom",1.0f);
   notesOpen=e->getConfBool("notesOpen",false);
   tunerOpen=e->getConfBool("tunerOpen",false);
   spectrumOpen=e->getConfBool("spectrumOpen",false);
@@ -8595,6 +8602,9 @@ void FurnaceGUI::commitState(DivConfig& conf) {
   conf.set("statsOpen",statsOpen);
   conf.set("compatFlagsOpen",compatFlagsOpen);
   conf.set("pianoOpen",pianoOpen);
+  conf.set("pianoRollOpen",pianoRollOpen);
+  conf.set("prChan",prChan);
+  conf.set("prZoom",prZoom);
   conf.set("notesOpen",notesOpen);
   conf.set("tunerOpen",tunerOpen);
   conf.set("spectrumOpen",spectrumOpen);
@@ -9041,6 +9051,15 @@ FurnaceGUI::FurnaceGUI():
   statsOpen(false),
   compatFlagsOpen(false),
   pianoOpen(false),
+  pianoRollOpen(false),
+  prChan(0),
+  prZoom(1.0f),
+  prNoteH(12.0f),
+  prEffectLaneH(32.0f),
+  prTimelineH(20.0f),
+  prShowAllChans(false),
+  prSelRow0(0),
+  prSelRow1(0),
   notesOpen(false),
   tunerOpen(false),
   spectrumOpen(false),
