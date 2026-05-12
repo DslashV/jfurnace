@@ -25,7 +25,7 @@ class DivExportSID: public DivROMExport {
   std::thread* exportThread;
   DivROMExportProgress progress[2];
   bool running, failed, mustAbort;
-  bool withPCM;
+  bool withPCM = false;
   void run();
   public:
     bool go(DivEngine* eng);
