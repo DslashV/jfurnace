@@ -34,6 +34,6 @@ class DivExportSID: public DivROMExport {
     void abort();
     void wait();
     DivROMExportProgress getProgress(int index=0);
-    DivExportSID(bool pcm): withPCM(pcm), exportThread(NULL), running(false), failed(false), mustAbort(false) {}
+    DivExportSID(bool pcm): exportThread(NULL), running(false), failed(false), mustAbort(false), withPCM(pcm) {}
     ~DivExportSID() {}
 };
